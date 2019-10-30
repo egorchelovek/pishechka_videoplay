@@ -1,14 +1,15 @@
 import sys, time, threading
-from omm import OMM
+from omx import OMX
+import RPi.GPIO as GPIO
 
 class MyDaemon():
         def run(self):
-		        self.init()
+		self.init()
                 threading.Thread(target=self.blink()).start()
-                self.omm.play(self.video)
+                self.omx.play(self.video,False)
                 while True:
-                    if self.omm.p.poll() is None:
-                        self.omm.play(self.blank,True)
+                    if self.omx.state() is None:
+                        self.omx.play(self.blank,True)
                     time.sleep(0.125)
 
         def init(self):
@@ -20,15 +21,15 @@ class MyDaemon():
             GPIO.setup(self.led_pin,GPIO.OUT)
 
             # init OMX
-            self.video = "/path/to/video.mp4"
-            self.blank = "/path/to/blank/video.mp4"
-            self.omm = OMM()
+            self.video = "./data/video.mp4"
+            self.blank = "./data/logo.mp4"
+            self.omx = OMX()
 
 
         def blink(self):
             GPIO.output(self.led_pin,True)
             time.sleep(0.5)
-            GPIO.ouput(self.led_pin,False)
+            GPIO.output(self.led_pin,False)
             time.sleep(0.5)
 
 

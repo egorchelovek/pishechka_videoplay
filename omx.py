@@ -7,14 +7,14 @@ import requests
 
 class OMX:
     def play(self, ifile, loop):
-        print("play : {}".format(ifile))
+        #print("play : {}".format(infile))
 
-        if "http" in infile:
+        if "http" in ifile:
             try:
                 r = requests.head(infile)
-                print(r.status_code)
+                #print(r.status_code)
             except requests.ConnectionError:
-                return("{} :- failed to connect".format(ifile))
+                return("{} :- failed to connect".format(infile))
         elif not os.path.exists(ifile):
             return "File {} not Found".format(ifile)
 
@@ -55,3 +55,6 @@ class OMX:
         else:
             self.p.stdin.write("-")
         return
+
+    def state(self):
+        return self.p.poll()
