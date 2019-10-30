@@ -30,7 +30,7 @@ class OMX:
         except:
             out, err = self.p.communicate()
             out = out.decode("utf-8").rstrip("\n")
-            return out
+            return outg
         return
 
     def pause(self):
@@ -56,5 +56,5 @@ class OMX:
             self.p.stdin.write("-")
         return
 
-    def state(self):
-        return self.p.poll()
+    def playing(self):
+        return self.p.poll() is None
