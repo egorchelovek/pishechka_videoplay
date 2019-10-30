@@ -17,4 +17,7 @@ sudo cp pishechka.sh /etc/init.d
 sudo chmod +x /etc/init.d/pishechka.sh
 sudo update-rc.d pishechka.sh defaults
 
+# Don't forget GPU mem
+sudo echo gpu_mem=128 >> /boot/config.txt
+
 echo "All done. It should work after reboot. Enjoy it!"
