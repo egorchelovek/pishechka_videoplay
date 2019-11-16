@@ -6,26 +6,31 @@ class Pishechka():
     def run(self):
         self.init()
 
-        thread_led = threading.Thread(target=self.blink)
-        thread_led.start()
+        # lights up led
+        GPIO.output(self.led_pin,True)
 
-        thread_button = threading.Thread(target=self.check)
-        thread_button.start()
-
+        # run screensaver video
         self.play(self.screensaver)
+
+        button_pushed_before = False
+        button_pushed_now = False
         while True:
-            playing_video = self.video.is_playing()
-            if not self.button_pushed_before and self.button_pushed_now:
+            # poll button
+            button_pushed_now = GPIO.input(self.button_pin)
+
+            # react only for changing button state from LOW to HIGH
+            if not button_pushed_before and button_pushed_now:
+                # button pushed
                 if self.screensaver.is_playing():
                     self.stop(self.screensaver)
                     self.play(self.video)
                 else:
-                    self.set_position(0)
-            elif not playing_video:
-                if not self.screensaver.is_playing():
-                    self.play(self.screensaver)
+                    # start video from the begining
+                    self.video.set_position(0)
 
-            time.sleep(0.005)
+            # waiting and save button old state
+            time.sleep(0.125)
+            button_pushed_before = self.button_pushed_now
 
         self.video.quit()
         self.screensaver.quit()
@@ -34,18 +39,22 @@ class Pishechka():
 
     def init(self):
         # init GPIO
+        GPIO.setmode(GPIO.BOARD)
+        # set up pins
         self.button_pin = 10
         self.led_pin = 8
-        GPIO.setmode(GPIO.BOARD)
+        #
         GPIO.setup(self.button_pin,GPIO.IN)
         GPIO.setup(self.led_pin,GPIO.OUT)
 
-        # init OMX
+        # init OMX players
         screensaver_video = "/opt/pishechka_videoplay/data/screensaver.mp4"
         content_video = "/opt/pishechka_videoplay/data/content.mp4"
+        #
         self.screensaver = OMXPlayer(screensaver_video,args=['--no-osd','--loop'], dbus_name='org.mpris.MediaPlayer2.omxplayer1')
         self.stop(self.screensaver)
-        self.video = OMXPlayer(content_video,args=['--no-osd'], dbus_name='org.mpris.MediaPlayer2.omxplayer2')
+        #
+        self.video = OMXPlayer(content_video,args=['--no-osd','--loop'], dbus_name='org.mpris.MediaPlayer2.omxplayer2')
         self.stop(self.video)
 
     def stop(self,video):
@@ -55,21 +64,6 @@ class Pishechka():
     def play(self,video):
         video.show_video()
         video.play()
-
-    def blink(self):
-        while(True):
-            GPIO.output(self.led_pin,True)
-            time.sleep(0.5)
-            GPIO.output(self.led_pin,False)
-            time.sleep(0.5)
-
-    def check(self):
-        self.button_pushed_before = False
-        self.button_pushed_now = False
-        while(True):
-            self.button_pushed_now = GPIO.input(self.button_pin)
-            time.sleep(0.125)
-            self.button_pushed_before = self.button_pushed_now
 
 
 if __name__ == "__main__":
