@@ -34,8 +34,6 @@ class Pishechka():
 
         self.video.quit()
         self.screensaver.quit()
-        thread_led.join()
-        thread_button.join()
 
     def init(self):
         # init GPIO
