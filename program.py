@@ -30,7 +30,7 @@ class Pishechka():
 
             # waiting and save button old state
             time.sleep(0.125)
-            button_pushed_before = self.button_pushed_now
+            button_pushed_before = button_pushed_now
 
         self.video.quit()
         self.screensaver.quit()
